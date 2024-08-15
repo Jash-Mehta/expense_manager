@@ -2,6 +2,7 @@ import 'package:expense_manager/controller/date_filterController.dart';
 import 'package:expense_manager/controller/deleteController.dart';
 import 'package:expense_manager/controller/insertController.dart';
 import 'package:expense_manager/view/add_expense.dart';
+import 'package:expense_manager/view/summary_expense.dart';
 import 'package:expense_manager/widget/widget_constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,12 +25,16 @@ class _DashboardState extends State<Dashboard> {
   String formattedStartDate = "";
   String formattedEndDate = "";
   bool filterStatus = false;
+
+  bool monthlyClick = false;
   @override
   void initState() {
     super.initState();
     getExpenses.getExpenses();
     getExpenses.getDailyTotal(DateFormat('yyyy-MM-dd').format(startDate),
         DateFormat('yyyy-MM-dd').format(endDate));
+    monthlyClick = false;
+    setState(() {});
   }
 
   startDatePicker() async {
@@ -74,10 +79,14 @@ class _DashboardState extends State<Dashboard> {
           "Dashboard",
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
-        actions: const [
+        actions: [
           Padding(
             padding: EdgeInsets.only(right: 8.0),
-            child: Icon(Icons.history),
+            child: InkWell(
+                onTap: () {
+                  Get.to(SummaryExpensesUI());
+                },
+                child: Icon(Icons.history)),
           )
         ],
       ),
@@ -85,54 +94,61 @@ class _DashboardState extends State<Dashboard> {
           GetBuilder<InsertController>(builder: (InsertController controller) {
         return Column(
           children: [
-            SfCartesianChart(
-              series: [
-                LineSeries<SalesData, String>(
-                  dataSource:
-                      List.generate(controller.daily_expenses.length, (index) {
-                    final dateString =
-                        controller.daily_expenses[index]['date'] as String;
-                    final parsedDate =
-                        DateFormat('yyyy-MM-dd').parse(dateString);
-                    final formattedDate = DateFormat('dd').format(parsedDate);
-                    return SalesData(
-                        formattedDate,
-                        double.parse(controller.daily_expenses[index]['total']
-                            .toString()));
-                  }),
-                  width: 0.5,
-                  // borderWidth: 0.3,
-                  xValueMapper: (SalesData sales, _) => sales.year,
-                  yValueMapper: (SalesData sales, _) => sales.sales,
-                  dataLabelSettings: DataLabelSettings(
-                      isVisible: true,
-                      textStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold)),
-                  // gradient: LinearGradient(
-                  //     end: Alignment.topCenter,
-                  //     begin: Alignment.bottomCenter,
-                  //     colors: [
-                  //       Theme.of(context).highlightColor,
-                  //       Theme.of(context).primaryColor,
-                  //     ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      monthlyClick = false;
+                    });
+                  },
+                  child: Container(
+                    height: 40.0,
+                    width: 120.0,
+                    decoration: BoxDecoration(
+                        color: monthlyClick
+                            ? Theme.of(context).highlightColor
+                            : Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(15.0)),
+                    child: Center(
+                        child: Text(
+                      "Weekly",
+                      style: TextStyle(
+                          color: monthlyClick
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context).highlightColor),
+                    )),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    controller.fetchMonthlyTotals();
+                    setState(() {
+                      monthlyClick = true;
+                    });
+                  },
+                  child: Container(
+                    height: 40.0,
+                    width: 120.0,
+                    decoration: BoxDecoration(
+                        color: monthlyClick
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).highlightColor,
+                        borderRadius: BorderRadius.circular(15.0)),
+                    child: Center(
+                        child: Text(
+                      "Monthly",
+                      style: TextStyle(
+                          color: monthlyClick
+                              ? Theme.of(context).highlightColor
+                              : Theme.of(context).primaryColor),
+                    )),
+                  ),
                 ),
               ],
-              primaryXAxis: CategoryAxis(
-                majorGridLines: MajorGridLines(
-                    color: Theme.of(context)
-                        .focusColor), // Set the color of the x-axis lines
-                majorTickLines:
-                    MajorTickLines(color: Theme.of(context).focusColor),
-              ),
-              primaryYAxis: NumericAxis(
-                  majorGridLines: MajorGridLines(
-                      color: Theme.of(context)
-                          .focusColor), // Set the color of the x-axis lines
-                  majorTickLines:
-                      MajorTickLines(color: Theme.of(context).focusColor)),
             ),
+            commonGraphs(context, monthlyClick, controller),
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
               child: Text(

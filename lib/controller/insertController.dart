@@ -7,76 +7,70 @@ import 'package:sqflite/sqflite.dart';
 class InsertController extends GetxController {
   List<dynamic> allExpenses = [];
   List<dynamic> daily_expenses = [];
+  List<dynamic> monthly_expenses = [];
   DateTime startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime endDate = DateTime.now();
   String formattedStartDate = "";
   String formattedEndDate = "";
-Future<void> insertExpense(
-  String description, 
-  int amount, 
-  String date
-) async {
-  final db = await initDatabase();
-  try {
-   
-    AddExpenses expense = AddExpenses(
-      description: description, 
-      amount: amount, 
-      date: date,
-    );
-
-  
-    await db.insert(
-      'expenses',
-      expense.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-
-    DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(date);
-
-
-    String month = DateFormat('MMMM').format(parsedDate);
-    int year = parsedDate.year;
-
-    // Check if the monthly total already exists
-    final List<Map<String, dynamic>> existing = await db.query(
-      'monthly_totals',
-      where: 'month = ? AND year = ?',
-      whereArgs: [month, year],
-    );
-
-    if (existing.isNotEmpty) {
-      // Update the existing monthly total
-      final total = existing.first['total'] + amount;
-      await db.update(
-        'monthly_totals',
-        {'total': total},
-        where: 'id = ?',
-        whereArgs: [existing.first['id']],
+  Future<void> insertExpense(
+      String description, int amount, String date) async {
+    final db = await initDatabase();
+    try {
+      AddExpenses expense = AddExpenses(
+        description: description,
+        amount: amount,
+        date: date,
       );
-    } else {
-      // Insert a new monthly total entry
-      await db.insert('monthly_totals', {
-        'month': month,
-        'year': year,
-        'total': amount,
-      });
+
+      await db.insert(
+        'expenses',
+        expense.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(date);
+
+      String month = DateFormat('MMMM').format(parsedDate);
+      int year = parsedDate.year;
+
+      // Check if the monthly total already exists
+      final List<Map<String, dynamic>> existing = await db.query(
+        'monthly_totals',
+        where: 'month = ? AND year = ?',
+        whereArgs: [month, year],
+      );
+
+      if (existing.isNotEmpty) {
+        // Update the existing monthly total
+        final total = existing.first['total'] + amount;
+        await db.update(
+          'monthly_totals',
+          {'total': total},
+          where: 'id = ?',
+          whereArgs: [existing.first['id']],
+        );
+      } else {
+        // Insert a new monthly total entry
+        await db.insert('monthly_totals', {
+          'month': month,
+          'year': year,
+          'total': amount,
+        });
+      }
+
+      Get.back();
+
+      getExpenses();
+      getDailyTotal(
+        DateFormat('yyyy-MM-dd').format(startDate),
+        DateFormat('yyyy-MM-dd').format(endDate),
+      );
+    } catch (e) {
+      print(e);
     }
-
-
-    Get.back();
-
-    getExpenses();
-    getDailyTotal(
-      DateFormat('yyyy-MM-dd').format(startDate),
-      DateFormat('yyyy-MM-dd').format(endDate),
-    );
-  } catch (e) {
-    print(e);
   }
-}
 
+// OverAll Expenses
   Future<List<Map<String, dynamic>>> getExpenses() async {
     final db = await initDatabase();
     allExpenses.clear();
@@ -85,6 +79,17 @@ Future<void> insertExpense(
     return await db.query('expenses');
   }
 
+  // Monthly Expenses
+  Future<List<Map<String, dynamic>>> fetchMonthlyTotals() async {
+    final db = await initDatabase();
+    monthly_expenses.clear();
+    monthly_expenses.addAll(
+        await db.query('monthly_totals', orderBy: 'year ASC, month ASC'));
+    update();
+    return db.query('monthly_totals', orderBy: 'year ASC, month ASC');
+  }
+
+// Daily Expenses
   Future<Map<String, dynamic>?> getDailyTotal(String start, String end) async {
     final db = await initDatabase();
     List<Map<String, dynamic>> result = await db.query(

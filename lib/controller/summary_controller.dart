@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../sql/add_expenseDB.dart';
 
 class SummaryController extends GetxController {
+  var weeklyExpense;
   Future<void> fetchWeeklyExpense() async {
     final db = await initDatabase();
     final currentDate = DateTime.now();
@@ -18,6 +19,8 @@ class SummaryController extends GetxController {
     ''',
       [startOfWeek.toIso8601String(), endOfWeek.toIso8601String()],
     );
+    weeklyExpense = results[0]['total'];
+    update();
     print(results[0]['total']);
   }
 }
