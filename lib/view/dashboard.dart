@@ -84,9 +84,9 @@ class _DashboardState extends State<Dashboard> {
             padding: EdgeInsets.only(right: 8.0),
             child: InkWell(
                 onTap: () {
-                  Get.to(SummaryExpensesUI());
+                  Get.to(const SummaryExpensesUI());
                 },
-                child: Icon(Icons.history)),
+                child: const Icon(Icons.history)),
           )
         ],
       ),
@@ -194,7 +194,7 @@ class _DashboardState extends State<Dashboard> {
                   }
                   endDatePicker();
                 }),
-                IconButton(onPressed: () {}, icon: Icon(Icons.filter_alt))
+                IconButton(onPressed: () {}, icon: const Icon(Icons.filter_alt))
               ],
             ),
             Expanded(
@@ -203,33 +203,55 @@ class _DashboardState extends State<Dashboard> {
                   ? datefilterController.filterDateExpenses.length
                   : controller.allExpenses.length,
               itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  onLongPress: () {
+                return Dismissible(
+                  key: Key(controller.allExpenses[index]['id'].toString()),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
                     deleteExpenses
                         .deleteExpense(controller.allExpenses[index]['id']);
+
+                    controller.allExpenses.removeAt(index);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Expense deleted')),
+                    );
                   },
-                  leading: Container(
-                    height: 60.0,
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 105, 102, 102),
-                    ),
-                    margin: const EdgeInsets.only(left: 10.0),
-                    child: Icon(
-                      Icons.receipt,
-                      size: 40,
-                      color: Theme.of(context).highlightColor,
-                    ),
+                  background: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Icon(Icons.delete, color: Colors.white),
                   ),
-                  title: Text(controller.allExpenses[index]['description'],
+                  child: ListTile(
+                    onTap: () {},
+                    leading: Container(
+                      height: 60.0,
+                      decoration: const BoxDecoration(
+                        color: Color.fromARGB(255, 105, 102, 102),
+                      ),
+                      margin: const EdgeInsets.only(left: 10.0),
+                      child: Icon(
+                        Icons.receipt,
+                        size: 40,
+                        color: Theme.of(context).highlightColor,
+                      ),
+                    ),
+                    title: Text(
+                      controller.allExpenses[index]['description'],
                       style: TextStyle(
-                          fontSize: 18.0,
-                          color: Theme.of(context).primaryColor)),
-                  subtitle: Text(controller.allExpenses[index]['date']),
-                  trailing: Text(
+                        fontSize: 18.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    subtitle: Text(controller.allExpenses[index]['date']),
+                    trailing: Text(
                       "₹ ${controller.allExpenses[index]['amount'].toString()}",
                       style: TextStyle(
-                          fontSize: 18.0,
-                          color: Theme.of(context).primaryColor)),
+                        fontSize: 18.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
                 );
               },
             ))
