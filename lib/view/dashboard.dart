@@ -77,7 +77,7 @@ class _DashboardState extends State<Dashboard> {
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 8.0),
-            child: Icon(Icons.notifications),
+            child: Icon(Icons.history),
           )
         ],
       ),
@@ -87,7 +87,7 @@ class _DashboardState extends State<Dashboard> {
           children: [
             SfCartesianChart(
               series: [
-                ColumnSeries<SalesData, String>(
+                LineSeries<SalesData, String>(
                   dataSource:
                       List.generate(controller.daily_expenses.length, (index) {
                     final dateString =
@@ -101,7 +101,7 @@ class _DashboardState extends State<Dashboard> {
                             .toString()));
                   }),
                   width: 0.5,
-                  borderWidth: 0.3,
+                  // borderWidth: 0.3,
                   xValueMapper: (SalesData sales, _) => sales.year,
                   yValueMapper: (SalesData sales, _) => sales.sales,
                   dataLabelSettings: DataLabelSettings(
@@ -110,13 +110,13 @@ class _DashboardState extends State<Dashboard> {
                           color: Theme.of(context).primaryColor,
                           fontSize: 15.0,
                           fontWeight: FontWeight.bold)),
-                  gradient: LinearGradient(
-                      end: Alignment.topCenter,
-                      begin: Alignment.bottomCenter,
-                      colors: [
-                        Theme.of(context).highlightColor,
-                        Theme.of(context).primaryColor,
-                      ]),
+                  // gradient: LinearGradient(
+                  //     end: Alignment.topCenter,
+                  //     begin: Alignment.bottomCenter,
+                  //     colors: [
+                  //       Theme.of(context).highlightColor,
+                  //       Theme.of(context).primaryColor,
+                  //     ]),
                 ),
               ],
               primaryXAxis: CategoryAxis(
@@ -139,7 +139,7 @@ class _DashboardState extends State<Dashboard> {
                 "Daily Expenses",
                 style: TextStyle(
                     color: Theme.of(context).primaryColor,
-                    fontSize: 18.0,
+                    fontSize: 20.0,
                     fontWeight: FontWeight.w500),
               ),
             ),
@@ -147,7 +147,7 @@ class _DashboardState extends State<Dashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text(
-                  "From".padRight(6),
+                  "From".padRight(0),
                 ),
                 datePick(context, false,
                     title: formattedStartDate.isNotEmpty
@@ -162,9 +162,9 @@ class _DashboardState extends State<Dashboard> {
                   }
                   startDatePicker();
                 }),
-                const SizedBox(width: 5),
+                const SizedBox(width: 0),
                 Text(
-                  "To".padRight(4),
+                  "To".padRight(0),
                 ),
                 datePick(context, false,
                     title:
@@ -178,6 +178,7 @@ class _DashboardState extends State<Dashboard> {
                   }
                   endDatePicker();
                 }),
+                IconButton(onPressed: () {}, icon: Icon(Icons.filter_alt))
               ],
             ),
             Expanded(

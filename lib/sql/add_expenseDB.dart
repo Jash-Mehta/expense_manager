@@ -28,6 +28,16 @@ Future<Database> initDatabase() async {
         )
         ''',
       );
+       await db.execute(
+        '''
+        CREATE TABLE monthly_totals(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          month TEXT,
+          year INTEGER,
+          total REAL
+        )
+        '''
+      );
     },
   );
 }

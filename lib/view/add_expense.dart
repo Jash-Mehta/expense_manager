@@ -67,12 +67,14 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
           return SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(
                   height: 20.0,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                 
                   children: [
                     Expanded(
                       flex: 1,

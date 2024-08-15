@@ -11,26 +11,71 @@ class InsertController extends GetxController {
   DateTime endDate = DateTime.now();
   String formattedStartDate = "";
   String formattedEndDate = "";
-  Future<void> insertExpense(
-      String description, int amount, String date) async {
-    final db = await initDatabase();
-    try {
-      AddExpenses expense =
-          AddExpenses(description: description, amount: amount, date: date);
+Future<void> insertExpense(
+  String description, 
+  int amount, 
+  String date
+) async {
+  final db = await initDatabase();
+  try {
+   
+    AddExpenses expense = AddExpenses(
+      description: description, 
+      amount: amount, 
+      date: date,
+    );
 
-      await db.insert(
-        'expenses',
-        expense.toJson(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+  
+    await db.insert(
+      'expenses',
+      expense.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+
+    DateTime parsedDate = DateFormat('yyyy-MM-dd').parse(date);
+
+
+    String month = DateFormat('MMMM').format(parsedDate);
+    int year = parsedDate.year;
+
+    // Check if the monthly total already exists
+    final List<Map<String, dynamic>> existing = await db.query(
+      'monthly_totals',
+      where: 'month = ? AND year = ?',
+      whereArgs: [month, year],
+    );
+
+    if (existing.isNotEmpty) {
+      // Update the existing monthly total
+      final total = existing.first['total'] + amount;
+      await db.update(
+        'monthly_totals',
+        {'total': total},
+        where: 'id = ?',
+        whereArgs: [existing.first['id']],
       );
-      Get.back();
-      getExpenses();
-      getDailyTotal(DateFormat('yyyy-MM-dd').format(startDate),
-          DateFormat('yyyy-MM-dd').format(endDate));
-    } catch (e) {
-      print(e);
+    } else {
+      // Insert a new monthly total entry
+      await db.insert('monthly_totals', {
+        'month': month,
+        'year': year,
+        'total': amount,
+      });
     }
+
+
+    Get.back();
+
+    getExpenses();
+    getDailyTotal(
+      DateFormat('yyyy-MM-dd').format(startDate),
+      DateFormat('yyyy-MM-dd').format(endDate),
+    );
+  } catch (e) {
+    print(e);
   }
+}
 
   Future<List<Map<String, dynamic>>> getExpenses() async {
     final db = await initDatabase();
