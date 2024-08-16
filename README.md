@@ -1,4 +1,4 @@
-# Expense Manager
+# Expense Manager 👩‍💻
 
 Expense Manager is a Flutter application designed to help users manage their daily, weekly, and monthly expenses efficiently. The app utilizes SQLite for local data storage through the `sqflite` package and implements state management using the `GetX` package.
 
