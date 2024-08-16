@@ -74,23 +74,43 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
         actions: [
           IconButton(
             onPressed: () {
-              if (descriptionText.text.isNotEmpty &&
-                  amountText.text.isNotEmpty) {
-                addexpense.insertExpense(
-                  descriptionText.text,
-                  int.parse(amountText.text),
-                  formattedStartDate,
-                );
-                addexpense.updateDailyTotal(
-                  formattedStartDate,
-                  double.parse(amountText.text),
-                );
-                Navigator.pop(context); // Close the screen after saving
+              if (widget.updateclick == false) {
+                if (descriptionText.text.isNotEmpty &&
+                    amountText.text.isNotEmpty) {
+                  addexpense.insertExpense(
+                    descriptionText.text,
+                    int.parse(amountText.text),
+                    formattedStartDate,
+                  );
+                  addexpense.updateDailyTotal(
+                    formattedStartDate,
+                    double.parse(amountText.text),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill in all fields')),
+                  );
+                }
               } else {
-                // Show an error message if fields are empty
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please fill in all fields')),
-                );
+                if (descriptionText.text.isNotEmpty &&
+                    amountText.text.isNotEmpty) {
+                  updateExpenses.updateExpensesController(
+                      widget.id!,
+                      descriptionText.text,
+                      formattedStartDate,
+                      int.parse(amountText.text));
+                  addexpense.updateDailyTotalwithoutnew(
+                      formattedStartDate,
+                      double.parse(amountText.text),
+                      double.parse(widget.amount.toString()));
+                  Navigator.pop(context); // Close the screen after saving
+                } else {
+                  // Show an error message if fields are empty
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill in all fields')),
+                  );
+                }
               }
             },
             icon: const Icon(Icons.check, size: 30),
