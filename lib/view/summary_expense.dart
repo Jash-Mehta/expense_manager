@@ -11,12 +11,11 @@ class SummaryExpensesUI extends StatefulWidget {
 }
 
 class _SummaryExpensesUIState extends State<SummaryExpensesUI> {
-  var summaryExpense = Get.put(SummaryController());
-  var monthlyExpenses = Get.put(InsertController());
+  final summaryExpense = Get.put(SummaryController());
+  final monthlyExpenses = Get.put(InsertController());
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     summaryExpense.fetchWeeklyExpense();
   }
@@ -30,42 +29,80 @@ class _SummaryExpensesUIState extends State<SummaryExpensesUI> {
           "Summary Expenses",
           style: TextStyle(color: Theme.of(context).primaryColor),
         ),
-        actions: const [
+        backgroundColor: Theme.of(context).backgroundColor,
+        elevation: 0,
+        actions: [
           Padding(
-            padding: EdgeInsets.only(right: 8.0),
-            child: Icon(Icons.history),
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Icon(Icons.history, color: Theme.of(context).primaryColor),
           )
         ],
       ),
       body: GetBuilder<SummaryController>(
-          builder: (SummaryController controller) {
-        return Column(
-          children: [
-            Container(
-              height: 60,
-              width: double.infinity,
-              margin: const EdgeInsets.only(left: 20.0, right: 20.0),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).hintColor)),
-              child: Center(
-                  child: Text(
-                      "Weekly Expenses:- ${summaryExpense.weeklyExpense}",
-                      style: TextStyle(fontSize: 20.0))),
+        builder: (SummaryController controller) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildSummaryCard(
+                  context,
+                  "Weekly Expenses",
+                  summaryExpense.weeklyExpense.toString(),
+                ),
+                const SizedBox(height: 16),
+                _buildSummaryCard(
+                  context,
+                  "Monthly Expenses",
+                  monthlyExpenses.monthly_expenses.isNotEmpty
+                      ? monthlyExpenses.monthly_expenses[0]['total'].toString()
+                      : 'N/A',
+                ),
+              ],
             ),
-            Container(
-              height: 60,
-              width: double.infinity,
-              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).hintColor)),
-              child: Center(
-                  child: Text(
-                      "Monthly Expenses:- ${monthlyExpenses.monthly_expenses[0]['total']}",
-                      style: TextStyle(fontSize: 20.0))),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(BuildContext context, String title, String amount) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).highlightColor,
+        border: Border.all(color: Theme.of(context).hintColor),
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).hintColor,
             ),
-          ],
-        );
-      }),
+          ),
+          Text(
+            '₹ $amount',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

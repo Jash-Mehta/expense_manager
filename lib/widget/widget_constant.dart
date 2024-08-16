@@ -28,7 +28,7 @@ Widget datePick(context, bool time, {title, onpress, color}) {
 Widget commonGraphs(context, bool monthlyClick, InsertController controller) {
   return SfCartesianChart(
     series: [
-      ColumnSeries<SalesData, String>(
+      SplineAreaSeries<SalesData, String>(
         dataSource: monthlyClick
             ? List.generate(controller.monthly_expenses.length, (index) {
                 return SalesData(
@@ -46,35 +46,47 @@ Widget commonGraphs(context, bool monthlyClick, InsertController controller) {
                     double.parse(
                         controller.daily_expenses[index]['total'].toString()));
               }),
-        width: 0.5,
-        // borderWidth: 0.3,
         xValueMapper: (SalesData sales, _) => sales.year,
         yValueMapper: (SalesData sales, _) => sales.sales,
         dataLabelSettings: DataLabelSettings(
-            isVisible: true,
-            textStyle: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 15.0,
-                fontWeight: FontWeight.bold)),
+          isVisible: true,
+          textStyle: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 15.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         gradient: LinearGradient(
-            end: Alignment.topCenter,
-            begin: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).highlightColor,
-              Theme.of(context).primaryColor,
-            ]),
+          end: Alignment.topCenter,
+          begin: Alignment.bottomCenter,
+          colors: [
+            Theme.of(context).primaryColorLight.withOpacity(0.7),
+            Theme.of(context).primaryColor,
+          ],
+        ),
+        borderColor: Theme.of(context).primaryColorDark,
+        borderWidth: 2,
       ),
     ],
     primaryXAxis: CategoryAxis(
+      isVisible: true,
       majorGridLines: MajorGridLines(
           color: Theme.of(context)
               .focusColor), // Set the color of the x-axis lines
       majorTickLines: MajorTickLines(color: Theme.of(context).focusColor),
     ),
     primaryYAxis: NumericAxis(
-        majorGridLines: MajorGridLines(
-            color: Theme.of(context)
-                .focusColor), // Set the color of the x-axis lines
-        majorTickLines: MajorTickLines(color: Theme.of(context).focusColor)),
+      isVisible: false,
+      majorGridLines: MajorGridLines(
+          color: Theme.of(context)
+              .focusColor), // Set the color of the y-axis lines
+      majorTickLines: MajorTickLines(color: Theme.of(context).focusColor),
+    ),
   );
+}
+
+class SalesData {
+  SalesData(this.year, this.sales);
+  final String year;
+  final double sales;
 }
