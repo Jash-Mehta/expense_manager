@@ -1,6 +1,7 @@
 import 'package:expense_manager/controller/date_filterController.dart';
 import 'package:expense_manager/controller/deleteController.dart';
 import 'package:expense_manager/controller/insertController.dart';
+import 'package:expense_manager/services/notifi_services.dart';
 import 'package:expense_manager/view/add_expense.dart';
 import 'package:expense_manager/view/summary_expense.dart';
 import 'package:expense_manager/widget/widget_constant.dart';
@@ -34,6 +35,10 @@ class _DashboardState extends State<Dashboard> {
     getExpenses.getDailyTotal(DateFormat('yyyy-MM-dd').format(startDate),
         DateFormat('yyyy-MM-dd').format(endDate));
     monthlyClick = false;
+    Future.delayed(Duration(seconds: 5), () {
+      NotificationServices()
+          .showNotification(title: 'Reminder', body: 'Add your Daily Expenses');
+    });
     setState(() {});
   }
 
