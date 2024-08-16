@@ -234,11 +234,10 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
                 formattedStartDate,
                 double.parse(amountText.text),
               );
-              Navigator.pop(context); // Close the screen after saving
+              Navigator.pop(context);
             } else {
-              // Show an error message if fields are empty
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please fill in all fields')),
+                const SnackBar(content: Text('Please fill in all fields')),
               );
             }
           } else {
@@ -248,10 +247,10 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
                   descriptionText.text,
                   formattedStartDate,
                   int.parse(amountText.text));
-              addexpense.updateDailyTotal(
-                formattedStartDate,
-                double.parse(amountText.text),
-              );
+              addexpense.updateDailyTotalwithoutnew(
+                  formattedStartDate,
+                  double.parse(amountText.text),
+                  double.parse(widget.amount.toString()));
               Navigator.pop(context); // Close the screen after saving
             } else {
               // Show an error message if fields are empty

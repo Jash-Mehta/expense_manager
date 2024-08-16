@@ -32,8 +32,6 @@ class InsertController extends GetxController {
 
       String month = DateFormat('MMMM').format(parsedDate);
       int year = parsedDate.year;
-
-      // Check if the monthly total already exists
       final List<Map<String, dynamic>> existing = await db.query(
         'monthly_totals',
         where: 'month = ? AND year = ?',
@@ -41,7 +39,6 @@ class InsertController extends GetxController {
       );
 
       if (existing.isNotEmpty) {
-        // Update the existing monthly total
         final total = existing.first['total'] + amount;
         await db.update(
           'monthly_totals',
@@ -50,7 +47,6 @@ class InsertController extends GetxController {
           whereArgs: [existing.first['id']],
         );
       } else {
-        // Insert a new monthly total entry
         await db.insert('monthly_totals', {
           'month': month,
           'year': year,
@@ -71,26 +67,24 @@ class InsertController extends GetxController {
   }
 
 // OverAll Expenses
-  Future<List<Map<String, dynamic>>> getExpenses() async {
+  Future<void> getExpenses() async {
     final db = await initDatabase();
     allExpenses.clear();
     allExpenses.addAll(await db.query('expenses'));
     update();
-    return await db.query('expenses');
   }
 
   // Monthly Expenses
-  Future<List<Map<String, dynamic>>> fetchMonthlyTotals() async {
+  Future<void> fetchMonthlyTotals() async {
     final db = await initDatabase();
     monthly_expenses.clear();
     monthly_expenses.addAll(
         await db.query('monthly_totals', orderBy: 'year ASC, month ASC'));
     update();
-    return db.query('monthly_totals', orderBy: 'year ASC, month ASC');
   }
 
 // Daily Expenses
-  Future<Map<String, dynamic>?> getDailyTotal(String start, String end) async {
+  Future<void> getDailyTotal(String start, String end) async {
     final db = await initDatabase();
     List<Map<String, dynamic>> result = await db.query(
       'daily_totals',
@@ -100,7 +94,6 @@ class InsertController extends GetxController {
     daily_expenses.clear();
     daily_expenses.addAll(result);
     update();
-    return result.isNotEmpty ? result.first : null;
   }
 
   // Update the daily total expense
@@ -130,4 +123,46 @@ class InsertController extends GetxController {
       );
     }
   }
+
+ Future<void> updateDailyTotalwithoutnew(String date, double newAmount, double oldAmount) async {
+  final db = await initDatabase();
+
+  List<Map<String, dynamic>> result = await db.query(
+    'daily_totals',
+    where: 'date = ?',
+    whereArgs: [date],
+  );
+
+  if (result.isNotEmpty) {
+    double currentTotal = result.first['total'];
+    double adjustedTotal = currentTotal - oldAmount + newAmount;
+
+    if (adjustedTotal <= 0) {
+      await db.delete(
+        'daily_totals',
+        where: 'date = ?',
+        whereArgs: [date],
+      );
+    } else {
+      await db.update(
+        'daily_totals',
+        {'total': adjustedTotal},
+        where: 'date = ?',
+        whereArgs: [date],
+      );
+    }
+  } else {
+    await db.insert(
+      'daily_totals',
+      {'date': date, 'total': newAmount},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+  update();
+  getDailyTotal(
+    DateFormat('yyyy-MM-dd').format(startDate),
+    DateFormat('yyyy-MM-dd').format(endDate),
+  );
+}
+
 }
