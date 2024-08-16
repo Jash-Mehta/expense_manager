@@ -134,7 +134,9 @@ class _DashboardState extends State<Dashboard> {
           color: Theme.of(context).highlightColor,
         ),
         onPressed: () {
-          Get.to(const AddExpenseUI());
+          Get.to(AddExpenseUI(
+            updateclick: false,
+          ));
         },
         label: Text(
           "Add Expense",
@@ -325,6 +327,14 @@ class _DashboardState extends State<Dashboard> {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       child: ListTile(
+        onTap: () {
+          Get.to(AddExpenseUI(
+            updateclick: true,
+            amount: expenses[index]['amount'].toString(),
+            description: expenses[index]['description'],
+            id: expenses[index]['id'],
+          ));
+        },
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
         leading: CircleAvatar(
           radius: 30,

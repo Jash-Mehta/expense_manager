@@ -1,12 +1,24 @@
-import 'package:expense_manager/controller/insertController.dart';
-import 'package:expense_manager/widget/widget_constant.dart';
+import 'package:expense_manager/controller/update_expenseController.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import 'package:expense_manager/controller/insertController.dart';
+import 'package:expense_manager/widget/widget_constant.dart';
+
 class AddExpenseUI extends StatefulWidget {
-  const AddExpenseUI({super.key});
+  String? description;
+  String? amount;
+  int? id;
+  bool updateclick;
+  AddExpenseUI({
+    Key? key,
+    this.description,
+    this.amount,
+    this.id,
+    required this.updateclick,
+  }) : super(key: key);
 
   @override
   State<AddExpenseUI> createState() => _AddExpenseUIState();
@@ -14,9 +26,10 @@ class AddExpenseUI extends StatefulWidget {
 
 class _AddExpenseUIState extends State<AddExpenseUI> {
   final addexpense = Get.put(InsertController());
+  final updateExpenses = Get.put(UpdateExpenseController());
 
-  TextEditingController descriptionText = TextEditingController();
-  TextEditingController amountText = TextEditingController();
+  late TextEditingController descriptionText;
+  late TextEditingController amountText;
   DateTime startDate = DateTime.now();
   String formattedStartDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
@@ -37,13 +50,23 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    descriptionText = TextEditingController(
+        text: widget.updateclick ? widget.description : "");
+    amountText =
+        TextEditingController(text: widget.updateclick ? widget.amount : "");
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Theme.of(context).highlightColor,
         title: Text(
-          "Add Expense",
+          widget.updateclick ? "Update Expenses" : "Add Expenses",
           style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.w500),
@@ -200,22 +223,42 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
           color: Theme.of(context).highlightColor,
         ),
         onPressed: () {
-          if (descriptionText.text.isNotEmpty && amountText.text.isNotEmpty) {
-            addexpense.insertExpense(
-              descriptionText.text,
-              int.parse(amountText.text),
-              formattedStartDate,
-            );
-            addexpense.updateDailyTotal(
-              formattedStartDate,
-              double.parse(amountText.text),
-            );
-            Navigator.pop(context); // Close the screen after saving
+          if (widget.updateclick == false) {
+            if (descriptionText.text.isNotEmpty && amountText.text.isNotEmpty) {
+              addexpense.insertExpense(
+                descriptionText.text,
+                int.parse(amountText.text),
+                formattedStartDate,
+              );
+              addexpense.updateDailyTotal(
+                formattedStartDate,
+                double.parse(amountText.text),
+              );
+              Navigator.pop(context); // Close the screen after saving
+            } else {
+              // Show an error message if fields are empty
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Please fill in all fields')),
+              );
+            }
           } else {
-            // Show an error message if fields are empty
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Please fill in all fields')),
-            );
+            if (descriptionText.text.isNotEmpty && amountText.text.isNotEmpty) {
+              updateExpenses.updateExpensesController(
+                  widget.id!,
+                  descriptionText.text,
+                  formattedStartDate,
+                  int.parse(amountText.text));
+              addexpense.updateDailyTotal(
+                formattedStartDate,
+                double.parse(amountText.text),
+              );
+              Navigator.pop(context); // Close the screen after saving
+            } else {
+              // Show an error message if fields are empty
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Please fill in all fields')),
+              );
+            }
           }
         },
         label: Text(

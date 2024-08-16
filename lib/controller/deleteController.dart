@@ -44,8 +44,6 @@ class DeleteController extends GetxController {
           where: 'date = ?',
           whereArgs: [day],
         );
-        getExpense.getExpenses();
-        update();
 
         if (dailyTotal.isNotEmpty) {
           var updatedDailyTotal =
@@ -57,17 +55,24 @@ class DeleteController extends GetxController {
               where: 'date = ?',
               whereArgs: [day],
             );
+            getExpense.getDailyTotal(
+              DateFormat('yyyy-MM-dd').format(startDate),
+              DateFormat('yyyy-MM-dd').format(endDate),
+            );
           } else {
             await db.update(
               'daily_totals',
               {'total': updatedDailyTotal},
-              where: 'date BETWEEN ? AND ?',
-              whereArgs: [formattedStartDate, formattedEndDate],
+              where: 'date = ?',
+              whereArgs: [day],
             );
           }
+          getExpense.getDailyTotal(
+            DateFormat('yyyy-MM-dd').format(startDate),
+            DateFormat('yyyy-MM-dd').format(endDate),
+          );
+          update();
         }
-        getExpense.getDailyTotal(formattedStartDate, formattedEndDate);
-        update();
 
         // Update the monthly_totals table
         final monthlyTotal = await db.query(
@@ -95,6 +100,7 @@ class DeleteController extends GetxController {
             );
           }
         }
+
         getExpense.fetchMonthlyTotals();
         update();
       }
