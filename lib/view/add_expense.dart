@@ -195,7 +195,7 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColorDark,
         icon: Icon(
-          Icons.,
+          Icons.check,
           size: 30.0,
           color: Theme.of(context).highlightColor,
         ),
