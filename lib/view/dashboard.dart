@@ -127,17 +127,21 @@ class _DashboardState extends State<Dashboard> {
         );
       }),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColorDark,
         icon: Icon(
           Icons.add,
-          color: Theme.of(context).hintColor,
+          size: 30.0,
+          color: Theme.of(context).highlightColor,
         ),
         onPressed: () {
           Get.to(const AddExpenseUI());
         },
         label: Text(
           "Add Expense",
-          style: TextStyle(color: Theme.of(context).hintColor),
+          style: TextStyle(
+              color: Theme.of(context).highlightColor,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold),
         ),
       ),
     );

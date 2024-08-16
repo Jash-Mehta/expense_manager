@@ -192,6 +192,40 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        icon: Icon(
+          Icons.,
+          size: 30.0,
+          color: Theme.of(context).highlightColor,
+        ),
+        onPressed: () {
+          if (descriptionText.text.isNotEmpty && amountText.text.isNotEmpty) {
+            addexpense.insertExpense(
+              descriptionText.text,
+              int.parse(amountText.text),
+              formattedStartDate,
+            );
+            addexpense.updateDailyTotal(
+              formattedStartDate,
+              double.parse(amountText.text),
+            );
+            Navigator.pop(context); // Close the screen after saving
+          } else {
+            // Show an error message if fields are empty
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Please fill in all fields')),
+            );
+          }
+        },
+        label: Text(
+          "Submit",
+          style: TextStyle(
+              color: Theme.of(context).highlightColor,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }

@@ -48,23 +48,23 @@ Widget commonGraphs(context, bool monthlyClick, InsertController controller) {
               }),
         xValueMapper: (SalesData sales, _) => sales.year,
         yValueMapper: (SalesData sales, _) => sales.sales,
-        dataLabelSettings: DataLabelSettings(
+        dataLabelSettings: const DataLabelSettings(
           isVisible: true,
           textStyle: TextStyle(
-            color: Theme.of(context).hintColor,
+            color: Color.fromARGB(115, 4, 4, 4),
             fontSize: 15.0,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
           ),
         ),
         gradient: LinearGradient(
           end: Alignment.topCenter,
           begin: Alignment.bottomCenter,
           colors: [
-            Theme.of(context).primaryColorLight.withOpacity(0.7),
+            Theme.of(context).primaryColorLight.withOpacity(0.0),
             Theme.of(context).primaryColor,
           ],
         ),
-        borderColor: Theme.of(context).primaryColorDark,
+        borderColor: Theme.of(context).primaryColor,
         borderWidth: 2,
       ),
     ],
