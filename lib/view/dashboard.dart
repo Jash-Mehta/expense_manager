@@ -212,7 +212,7 @@ class _DashboardState extends State<Dashboard> {
           child: Text(
             "Daily Expenses",
             style: TextStyle(
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).hintColor,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
