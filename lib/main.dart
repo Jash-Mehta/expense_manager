@@ -6,22 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
-
-
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  NotificationServices().initNotification();
- 
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  // Initialize your notification services
+  final notificationService = NotificationServices();
+  await notificationService.initNotification();
   runApp(const MyApp());
 }
 
@@ -39,6 +32,5 @@ class MyApp extends StatelessWidget {
           theme: light,
           home: Dashboard());
     });
-    
   }
 }

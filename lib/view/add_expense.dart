@@ -51,12 +51,18 @@ class _AddExpenseUIState extends State<AddExpenseUI> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
     descriptionText = TextEditingController(
         text: widget.updateclick ? widget.description : "");
-    amountText =
-        TextEditingController(text: widget.updateclick ? widget.amount : "");
+
+    // Convert amount to an integer if it's a double, then convert to string
+    String? amountTextValue = widget.updateclick
+        ? (double.tryParse(widget.amount.toString())?.toInt().toString() ??
+            widget.amount)
+        : "";
+
+    amountText = TextEditingController(text: amountTextValue);
   }
 
   @override
